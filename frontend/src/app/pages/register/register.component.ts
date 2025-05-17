@@ -30,12 +30,16 @@ export class RegisterComponent {
   constructor(private auth: AuthService, private router: Router) {}
 
   register() {
+    if (!this.name || !this.email || !this.password) {
+      return alert('Kérlek, tölts ki minden mezőt!');
+    }
+
     this.auth.register(this.name, this.email, this.password).subscribe({
       next: () => {
-        alert('Sikeres regisztráció');
+        alert('Sikeres regisztráció!');
         this.router.navigate(['/']);
       },
-      error: err => alert(err.error.error || 'Hiba a regisztráció során')
+      error: err => alert(err.error.error || 'Hiba a regisztráció során!')
     });
   }
 }

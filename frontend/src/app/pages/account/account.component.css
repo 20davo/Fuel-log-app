@@ -1,54 +1,17 @@
-mat-card {
-  max-width: 500px;
-  margin: 40px auto;
-  padding: 24px;
-  border-radius: 12px;
-  background-color: #f7f6f9;
-}
-
-.form-header {
-  text-align: center;
-  margin-bottom: 16px;
-}
-
-.entry-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-mat-form-field {
-  width: 80%;
-  margin: 0 auto;
-}
-
-button {
-  align-self: center;
-  width: 30%;
-
-}
-
-.entry-card {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 0 4px rgba(0,0,0,0.1);
-}
-
-.entry-header {
+.account-toolbar {
   display: flex;
   justify-content: space-between;
-  font-size: 15px;
-  margin-bottom: 8px;
-  color: #555;
+  padding: 0 16px;
 }
 
-.entry-data div {
-  margin-bottom: 4px;
+.app-title {
+  font-weight: 600;
+  font-size: 18px;
+  color: #0e0000;
 }
 
-.entry-actions {
-  margin-top: 8px;
-  text-align: right;
+.spacer {
+  flex: 1 1 auto;
+  color: #0e0000;
 }
+

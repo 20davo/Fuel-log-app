@@ -16,6 +16,9 @@ app.use('/api/fuel', fuelRoutes);
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
+const carRoutes = require('./routes/car');
+app.use('/api/cars', carRoutes);
+
 // Teszt route
 app.get('/ping', (req, res) => {
     res.send('pong');

@@ -1,0 +1,59 @@
+<mat-card class="toggle-card">
+  <div class="toggle-header">
+    <h3>Új autó hozzáadása</h3>
+    <button class="icon-toggle" mat-icon-button (click)="toggleAddForm()">
+      <mat-icon>{{ showAddForm ? 'expand_less' : 'expand_more' }}</mat-icon>
+    </button>
+  </div>
+
+  <div *ngIf="showAddForm" class="add-form">
+    <form class="entry-form">
+      <mat-form-field>
+        <mat-label>Márka</mat-label>
+        <input matInput [(ngModel)]="brand" name="brand" required>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Típus</mat-label>
+        <input matInput [(ngModel)]="model" name="model" required>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Évjárat</mat-label>
+        <input matInput type="number" [(ngModel)]="year" name="year" maxlength="4" 
+          (input)="limitYearLength($event)">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Motor</mat-label>
+        <input matInput [(ngModel)]="engine" name="engine">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Rendszám</mat-label>
+        <input matInput [(ngModel)]="plate" name="plate" (input)="formatPlate($event)" 
+          placeholder="ABC-123 vagy AA BB-123" maxlength="8">
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" (click)="addCar()">Mentés</button>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card style="margin-top: 20px;">
+  <h3>Autóim</h3>
+
+  <div *ngFor="let car of cars" class="entry-card">
+    <div class="entry-data">
+      <div><strong>{{ car.brand }} {{ car.model }}</strong></div>
+      <div *ngIf="car.year">Évjárat: {{ car.year }}</div>
+      <div *ngIf="car.engine">Motor: {{ car.engine }}</div>
+      <div *ngIf="car.plate">Rendszám: {{ formatPlateDisplay(car.plate) }}</div>
+    </div>
+
+    <div class="entry-actions">
+      <button mat-button color="primary" (click)="selectCar(car._id)">Bejegyzések</button>
+      <button mat-button color="warn" (click)="deleteCar(car._id)">Törlés</button>
+    </div>
+  </div>
+</mat-card>

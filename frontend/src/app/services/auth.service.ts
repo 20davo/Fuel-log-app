@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private API_URL = 'http://localhost:5000/api/auth';
   token: string | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   login(email: string, password: string) {
     return this.http.post<{ token: string, name: string }>(`${this.API_URL}/login`, { email, password });
@@ -33,5 +34,18 @@ export class AuthService {
   clearToken() {
     this.token = null;
     localStorage.removeItem('token');
+    localStorage.removeItem('name');
+  }
+
+  logout() {
+    this.clearToken();
+    this.router.navigate(['/']);
+  }
+
+  handleAuthError(err: any) {
+    if (err.status === 403 || (err.error && err.error.error === 'Érvénytelen token!')) {
+      alert('A bejelentkezésed lejárt! Kérlek jelentkezz be újra!');
+      this.logout();
+    }
   }
 }

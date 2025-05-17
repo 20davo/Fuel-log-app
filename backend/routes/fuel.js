@@ -20,69 +20,65 @@ function authenticateToken(req, res, next) {
 
 router.use(authenticateToken);
 
-// === GET /api/fuel – összes bejegyzés ===
+// === GET /api/fuel?carId=... – az adott autó bejegyzései ===
 router.get('/', async (req, res) => {
     try {
-        const entries = await FuelEntry.find({ userId: req.userId });
+        const { carId } = req.query;
+        if (!carId) return res.status(400).json({ error: 'Hiányzó carId paraméter!' });
+
+        const entries = await FuelEntry.find({ userId: req.userId, carId });
         res.json(entries);
     } catch (err) {
         res.status(500).json({ error: 'Hiba a lekérdezés során!' });
     }
 });
 
-// === POST /api/fuel – új bejegyzés validációval ===
+// === POST /api/fuel – új bejegyzés autóhoz ===
 router.post('/', [
+    body('carId').notEmpty().withMessage('Az autó azonosítója (carId) kötelező!'),
     body('date')
-      .isISO8601().toDate().withMessage('Érvénytelen dátum!')
-      .custom((value) => {
-        const now = new Date();
-        return value <= now;
-      }).withMessage('A dátum nem lehet a mai napnál későbbi!'),
-
+        .isISO8601().toDate().withMessage('Érvénytelen dátum!')
+        .custom(value => value <= new Date()).withMessage('A dátum nem lehet a mai napnál későbbi!'),
     body('odometer').isFloat({ min: 1 }).withMessage('A kilométeróra állása nem lehet negatív vagy nulla!'),
     body('liters').isFloat({ min: 0.1 }).withMessage('A liter értéke nem lehet negatív vagy nulla!'),
     body('unitPrice').isFloat({ min: 1 }).withMessage('Az egységár értéke nem lehet negatív vagy nulla!'),
     body('location').optional().isString().trim(),
 ], async (req, res) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
     try {
-    const userId = req.userId;
-    const { odometer, liters, unitPrice } = req.body;
-    const price = Math.round(liters * unitPrice);
+        const { carId, odometer, liters, unitPrice } = req.body;
+        const userId = req.userId;
+        const price = Math.round(liters * unitPrice);
 
-    // Keresd meg az előző bejegyzést ennél a felhasználónál (legutóbbi odometer alapján)
-    const lastEntry = await FuelEntry.findOne({ userId }).sort({ odometer: -1 });
+        // Keresd meg az utolsó bejegyzést ehhez az autóhoz
+        const lastEntry = await FuelEntry.findOne({ userId, carId }).sort({ odometer: -1 });
 
-    let consumption = undefined;
+        let consumption = undefined;
+        if (lastEntry && lastEntry.odometer && odometer > lastEntry.odometer) {
+            const distance = odometer - lastEntry.odometer;
+            consumption = Math.round((liters / distance) * 100 * 100) / 100;
+        }
 
-    if (lastEntry && lastEntry.odometer && odometer > lastEntry.odometer) {
-      const distance = odometer - lastEntry.odometer;
-      consumption = (liters / distance) * 100;
-      consumption = Math.round(consumption * 100) / 100; // két tizedesre kerekít
+        if (lastEntry && odometer <= lastEntry.odometer) {
+            return res.status(400).json({
+                errors: [{ msg: 'A kilométeróra állásnak nagyobbnak kell lennie az előző bejegyzéshez képest!' }]
+            });
+        }
+
+        const newEntry = new FuelEntry({
+            ...req.body,
+            userId,
+            price,
+            consumption
+        });
+
+        const saved = await newEntry.save();
+        res.status(201).json(saved);
+    } catch (err) {
+        res.status(400).json({ error: 'Hibás adat vagy mentési hiba!' });
     }
-
-    if (lastEntry && odometer <= lastEntry.odometer) {
-      return res.status(400).json({
-        errors: [{ msg: 'A kilométeróra állásnak nagyobbnak kell lennie az előző tankoláshoz képest!' }]
-      });
-    }
-
-    const newEntry = new FuelEntry({
-      ...req.body,
-      userId,
-      price,
-      consumption
-    });
-
-    const saved = await newEntry.save();
-    res.status(201).json(saved);
-  } catch (err) {
-    res.status(400).json({ error: 'Hibás adat vagy mentési hiba!' });
-  }
 });
 
 // === GET /api/fuel/:id ===

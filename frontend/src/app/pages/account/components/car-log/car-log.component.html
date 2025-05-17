@@ -1,0 +1,83 @@
+<mat-card class="toggle-card">
+  <div class="toggle-header">
+    <h3>Új bejegyzés</h3>
+    <button class="icon-toggle" mat-icon-button (click)="toggleAddForm()">
+      <mat-icon>{{ showAddForm ? 'expand_less' : 'expand_more' }}</mat-icon>
+    </button>
+  </div>
+
+  <div *ngIf="showAddForm" class="add-form">
+    <form class="entry-form">
+      <mat-form-field>
+        <mat-label>Dátum</mat-label>
+        <input matInput
+              type="text"
+              name="date"
+              required
+              maxlength="10"
+              [max]="today"
+              [ngModel]="date"
+              (input)="formatDate($event)"
+              placeholder="ÉÉÉÉ-HH-NN">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Kilométeróra állás</mat-label>
+        <input matInput [(ngModel)]="odometer" (ngModelChange)="onOdometerChange($event)" name="odometer" required>  
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Tankolt mennyiség (liter)</mat-label>
+        <input matInput type="number" [(ngModel)]="liters" name="liters" required>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Egységár (Ft / liter)</mat-label>
+        <input matInput type="number" [(ngModel)]="unitPrice" name="unitPrice" required>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Helyszín (opcionális)</mat-label>
+        <input matInput [(ngModel)]="location" name="location">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Üzemanyag típus</mat-label>
+        <mat-select [(ngModel)]="fuelType" name="fuelType">
+          <mat-option value="">– Válassz –</mat-option>
+          <mat-option value="benzin">Benzin</mat-option>
+          <mat-option value="dízel">Dízel</mat-option>
+          <mat-option value="gáz">LPG</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" (click)="create()">Mentés</button>
+    </form>
+  </div>
+</mat-card>
+
+
+<mat-card style="margin-top: 20px;">
+  <h3>Bejegyzések</h3>
+
+  <div *ngFor="let entry of entries" class="entry-card">
+    <div class="entry-header">
+      <strong>{{ entry.date | date:'yyyy.MM.dd' }}</strong>
+      <span>{{ entry.fuelType || '–' | titlecase }}</span>
+    </div>
+
+    <div class="entry-data">
+      <div>Kilométeróra állás: <strong>{{ entry.odometer | number: '1.0-0' }} km</strong></div>
+      <div>Tankolt mennyiség: <strong>{{ entry.liters }} L</strong></div>
+      <div>Egységár: <strong>{{ entry.unitPrice | number: '1.0-0' }} Ft/L</strong></div>
+      <div>Fizetett összeg: <strong>{{ entry.price | number: '1.0-0' }} Ft</strong></div>
+      <div *ngIf="entry.location">Helyszín: <strong>{{ entry.location }}</strong></div>
+      <div *ngIf="entry.consumption !== undefined">Fogyasztás: <strong>{{ entry.consumption }} L / 100 km</strong></div>
+    </div>
+
+    <div class="entry-actions">
+      <button mat-button color="warn" (click)="delete(entry._id)">Törlés</button>
+    </div>
+  </div>
+</mat-card>
+

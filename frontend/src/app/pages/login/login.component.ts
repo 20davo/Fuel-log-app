@@ -29,13 +29,18 @@ export class LoginComponent {
   constructor(private auth: AuthService, private router: Router) {}
 
   login() {
+    if (!this.email || !this.password) {
+      return alert('Kérlek, add meg az email címed és a jelszavad!');
+    }
+
     this.auth.login(this.email, this.password).subscribe({
       next: res => {
         this.auth.saveToken(res.token, res.name);
         this.router.navigate(['/account']);
       },
-      error: err => alert(err.error.error || 'Hiba a bejelentkezés során')
+      error: err => alert(err.error.error || 'Hiba a bejelentkezés során!')
     });
   }
+
 
 }

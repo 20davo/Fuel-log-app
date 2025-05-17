@@ -1,83 +1,32 @@
-<mat-card>
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    <h2>Fiók – {{ userName }}</h2>
-    <button mat-button color="warn" (click)="logout()">Kijelentkezés</button>
-  </div>
-</mat-card>
+<mat-toolbar color="primary" class="account-toolbar" style="background-color: #e5e7f0">
+  <span class="app-title">Tankolásnapló</span>
 
-<mat-card>
-  <div class="form-header">
-    <h2>Új bejegyzés</h2>
-  </div>
+  <span class="spacer"></span>
 
-  <form class="entry-form">
-    <mat-form-field appearance="outline">
-      <mat-label>Dátum</mat-label>
-      <input matInput
-            type="text"
-            name="date"
-            required
-            [max]="today"
-            [ngModel]="date"
-            (ngModelChange)="onDateInput($event)">
-    </mat-form-field>
+  <button mat-button [matMenuTriggerFor]="menu" >
+    Fiók – {{ auth.getName() }}
+    <mat-icon>arrow_drop_down</mat-icon>
+  </button>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Kilométeróra állás</mat-label>
-      <input matInput [(ngModel)]="odometer" (ngModelChange)="onOdometerChange($event)" name="odometer" required>  
-    </mat-form-field>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item [routerLink]="'cars'">
+      <mat-icon>directions_car</mat-icon>
+      <span>Autóim</span>
+    </button>
+    <button mat-menu-item [routerLink]="'stats'">
+      <mat-icon>bar_chart</mat-icon>
+      <span>Statisztikák</span>
+    </button>
+    <button mat-menu-item [routerLink]="'calculator'">
+      <mat-icon>calculate</mat-icon>
+      <span>Kalkulátor</span>
+    </button>
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Kijelentkezés</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Tankolt mennyiség (liter)</mat-label>
-      <input matInput type="number" [(ngModel)]="liters" name="liters" required>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Egységár (Ft / liter)</mat-label>
-      <input matInput type="number" [(ngModel)]="unitPrice" name="unitPrice" required>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Helyszín (opcionális)</mat-label>
-      <input matInput [(ngModel)]="location" name="location">
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Üzemanyag típus</mat-label>
-      <mat-select [(ngModel)]="fuelType" name="fuelType">
-        <mat-option value="">– Válassz –</mat-option>
-        <mat-option value="benzin">Benzin</mat-option>
-        <mat-option value="dízel">Dízel</mat-option>
-        <mat-option value="gáz">LPG</mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <button mat-raised-button color="primary" (click)="create()">Mentés</button>
-  </form>
-</mat-card>
-
-
-<mat-card style="margin-top: 20px;">
-  <h3>Bejegyzések</h3>
-
-  <div *ngFor="let entry of entries" class="entry-card">
-    <div class="entry-header">
-      <strong>{{ entry.date | date:'yyyy.MM.dd' }}</strong>
-      <span>{{ entry.fuelType || '–' | titlecase }}</span>
-    </div>
-
-    <div class="entry-data">
-      <div>Kilométeróra állás: <strong>{{ entry.odometer | number: '1.0-0' }} km</strong></div>
-      <div>Tankolt mennyiség: <strong>{{ entry.liters }} L</strong></div>
-      <div>Egységár: <strong>{{ entry.unitPrice | number: '1.0-0' }} Ft/L</strong></div>
-      <div>Fizetett összeg: <strong>{{ entry.price | number: '1.0-0' }} Ft</strong></div>
-      <div *ngIf="entry.location">Helyszín: <strong>{{ entry.location }}</strong></div>
-      <div *ngIf="entry.consumption !== undefined">Fogyasztás: <strong>{{ entry.consumption }} L / 100 km</strong></div>
-    </div>
-
-    <div class="entry-actions">
-      <button mat-button color="warn" (click)="delete(entry._id)">Törlés</button>
-    </div>
-  </div>
-</mat-card>
-
+<router-outlet></router-outlet>
