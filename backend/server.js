@@ -1,7 +1,8 @@
+require('dotenv').config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -10,13 +11,13 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// Route-ok
 const refuelRoutes = require('./routes/refuel');
-app.use('/api/refuel', refuelRoutes);
-
 const authRoutes = require('./routes/auth');
-app.use('/api/auth', authRoutes);
-
 const carRoutes = require('./routes/car');
+
+app.use('/api/refuel', refuelRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/cars', carRoutes);
 
 // Teszt route
@@ -25,9 +26,10 @@ app.get('/ping', (req, res) => {
 })
 
 // MongoDB kapcsolódás
-mongoose.connect(process.env.MONGO_URL || 'mongodb://localhost:27017/beadando')
-.then(() => console.log('MongoDB csatlakoztatva'))
-.catch(err => console.error('MongoDB hiba: ', err));
+mongoose
+    .connect(process.env.MONGO_URL)
+    .then(() => console.log('MongoDB csatlakoztatva'))
+    .catch(err => console.error('MongoDB hiba: ', err));
 
 // Szerver indítása
 app.listen(PORT, () => {
