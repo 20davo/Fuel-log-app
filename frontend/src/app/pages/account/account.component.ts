@@ -7,6 +7,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -24,9 +25,25 @@ import { MatDividerModule } from '@angular/material/divider';
   ]
 })
 export class AccountComponent {
-  constructor(public auth: AuthService) {}
+
+  constructor(public auth: AuthService, public router: Router) {}
+
+  isDark = false;
+
+  ngOnInit() {
+    this.isDark = localStorage.getItem('theme') === 'dark';
+    document.body.classList.toggle('dark-theme', this.isDark);
+  }
+
+  toggleTheme() {
+    this.isDark = !this.isDark;
+    document.body.classList.toggle('dark-theme', this.isDark);
+    localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+  }
 
   logout() {
     this.auth.logout();
+    this.router.navigate(['/']);
   }
+ 
 }

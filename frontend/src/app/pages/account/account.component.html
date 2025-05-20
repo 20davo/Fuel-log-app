@@ -1,9 +1,12 @@
-<mat-toolbar color="primary" class="account-toolbar" style="background-color: #e5e7f0">
+<mat-toolbar color="primary" class="account-toolbar">
   <span class="app-title">Tankolásnapló</span>
 
+  <button mat-icon-button (click)="toggleTheme()" aria-label="Téma váltás">
+    <mat-icon>{{ isDark ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
   <span class="spacer"></span>
 
-  <button mat-button [matMenuTriggerFor]="menu" >
+  <button class="menu" mat-button [matMenuTriggerFor]="menu" >
     Fiók – {{ auth.getName() }}
     <mat-icon>arrow_drop_down</mat-icon>
   </button>

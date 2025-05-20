@@ -10,8 +10,8 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-const fuelRoutes = require('./routes/fuel');
-app.use('/api/fuel', fuelRoutes);
+const refuelRoutes = require('./routes/refuel');
+app.use('/api/refuel', refuelRoutes);
 
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);

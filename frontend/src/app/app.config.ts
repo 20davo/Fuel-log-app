@@ -21,7 +21,8 @@ const routes: Routes = [
       { path: 'cars', component: CarListComponent },
       { path: 'cars/:id', component: CarLogComponent }
     ]
-  }
+  },
+  { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
 
 export const appConfig = {

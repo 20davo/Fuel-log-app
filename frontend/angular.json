@@ -26,6 +26,12 @@
                 "input": "public"
               }
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "node_modules",
+                "src"
+              ]
+            },
             "styles": [
               "@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.css"

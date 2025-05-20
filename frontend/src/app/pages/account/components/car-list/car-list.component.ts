@@ -39,7 +39,7 @@ export class CarListComponent implements OnInit {
   ngOnInit() {
     const token = this.auth.getToken();
     if (!token) {
-      alert('A bejelentkezésed lejárt. Kérlek jelentkezz be újra.');
+      alert('A bejelentkezésed lejárt! Kérlek jelentkezz be újra!');
       this.auth.logout();
       return;
     }

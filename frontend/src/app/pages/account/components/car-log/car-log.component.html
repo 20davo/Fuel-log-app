@@ -1,6 +1,6 @@
 <mat-card class="toggle-card">
   <div class="toggle-header">
-    <h3>Új bejegyzés</h3>
+    <h3>Új tankolás hozzáadása</h3>
     <button class="icon-toggle" mat-icon-button (click)="toggleAddForm()">
       <mat-icon>{{ showAddForm ? 'expand_less' : 'expand_more' }}</mat-icon>
     </button>
@@ -8,7 +8,7 @@
 
   <div *ngIf="showAddForm" class="add-form">
     <form class="entry-form">
-      <mat-form-field>
+      <mat-form-field appearance="outline">
         <mat-label>Dátum</mat-label>
         <input matInput
               type="text"
@@ -21,27 +21,29 @@
               placeholder="ÉÉÉÉ-HH-NN">
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field appearance="outline">
         <mat-label>Kilométeróra állás</mat-label>
-        <input matInput [(ngModel)]="odometer" (ngModelChange)="onOdometerChange($event)" name="odometer" required>  
+        <input matInput [(ngModel)]="odometer" (ngModelChange)="onOdometerChange($event)" 
+          name="odometer" required>
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field appearance="outline">
         <mat-label>Tankolt mennyiség (liter)</mat-label>
         <input matInput type="number" [(ngModel)]="liters" name="liters" required>
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field appearance="outline">
         <mat-label>Egységár (Ft / liter)</mat-label>
-        <input matInput type="number" [(ngModel)]="unitPrice" name="unitPrice" required>
+        <input matInput type="number" [(ngModel)]="unitPrice" name="unitPrice" 
+          required>
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field appearance="outline">
         <mat-label>Helyszín (opcionális)</mat-label>
         <input matInput [(ngModel)]="location" name="location">
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field appearance="outline">
         <mat-label>Üzemanyag típus</mat-label>
         <mat-select [(ngModel)]="fuelType" name="fuelType">
           <mat-option value="">– Válassz –</mat-option>
@@ -51,14 +53,15 @@
         </mat-select>
       </mat-form-field>
 
-      <button mat-raised-button color="primary" (click)="create()">Mentés</button>
+      <button mat-button (click)="create()">Mentés</button>
     </form>
   </div>
 </mat-card>
 
 
 <mat-card style="margin-top: 20px;">
-  <h3>Bejegyzések</h3>
+
+  <h3>{{ car.brand }} {{ car.model }}</h3>
 
   <div *ngFor="let entry of entries" class="entry-card">
     <div class="entry-header">
@@ -72,11 +75,11 @@
       <div>Egységár: <strong>{{ entry.unitPrice | number: '1.0-0' }} Ft/L</strong></div>
       <div>Fizetett összeg: <strong>{{ entry.price | number: '1.0-0' }} Ft</strong></div>
       <div *ngIf="entry.location">Helyszín: <strong>{{ entry.location }}</strong></div>
-      <div *ngIf="entry.consumption !== undefined">Fogyasztás: <strong>{{ entry.consumption }} L / 100 km</strong></div>
+      <div style="padding-top:10px" *ngIf="entry.consumption !== undefined">Fogyasztás: <strong>{{ entry.consumption }} L / 100 km</strong></div>
     </div>
 
     <div class="entry-actions">
-      <button mat-button color="warn" (click)="delete(entry._id)">Törlés</button>
+      <button mat-button (click)="delete(entry._id)">Törlés</button>
     </div>
   </div>
 </mat-card>

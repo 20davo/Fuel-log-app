@@ -50,15 +50,26 @@ export class CarLogComponent implements OnInit {
     this.userName = this.auth.getName();
     this.route.paramMap.subscribe(params => {
       const carId = params.get('id');
-      if (!carId) return alert('Hiányzó carId!');
+      if (!carId) {
+        alert('Hiányzó azonosító!');
+        this.router.navigate(['/account']);
+        return;
+      }
+      if (!/^[0-9a-fA-F]{24}$/.test(carId)) {
+        alert('Hibás autóazonosító formátum!');
+        this.router.navigate(['/account']);
+        return;
+      }
 
       this.carId = carId;
       this.fetch();
     });
   }
 
+  car: any = {};
+
   fetch() {
-    this.http.get<any[]>(`http://localhost:5000/api/fuel?carId=${this.carId}`, this.headers).subscribe({  
+    this.http.get<any[]>(`http://localhost:5000/api/refuel?carId=${this.carId}`, this.headers).subscribe({  
       next: data => this.entries = data,
       error: err => {
         if (err.error?.error === 'Érvénytelen token!') {
@@ -68,10 +79,16 @@ export class CarLogComponent implements OnInit {
         }
       }
     });
+
+    this.http.get<any>(`http://localhost:5000/api/cars/${this.carId}`, this.headers).subscribe({
+      next: car => {
+        this.car = car;
+      }
+    });
   }
 
   create() {
-    this.http.post('http://localhost:5000/api/fuel', {
+    this.http.post('http://localhost:5000/api/refuel', {
       carId: this.carId,
       date: this.date,
       odometer: this.odometerValue,
@@ -96,7 +113,7 @@ export class CarLogComponent implements OnInit {
   }
 
   delete(id: string) {
-    this.http.delete(`http://localhost:5000/api/fuel/${id}`, this.headers).subscribe({
+    this.http.delete(`http://localhost:5000/api/refuel/${id}`, this.headers).subscribe({
       next: () => this.fetch(),
       error: err => alert('Törlési hiba!')
     });

@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const Car = require('../models/Car');
@@ -27,6 +28,26 @@ router.get('/', async (req, res) => {
     res.json(cars);
   } catch (err) {
     res.status(500).json({ error: 'Hiba a lekérdezés során!' });
+  }
+});
+
+// === GET /api/cars/:id – egy autó lekérdezése ID alapján ===
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  // validáljuk az ObjectId formátumot
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ error: 'Érvénytelen azonosító!' });
+  }
+
+  try {
+    const car = await Car.findOne({ _id: id, userId: req.userId });
+    if (!car) {
+      return res.status(404).json({ error: 'Nem található ilyen autó!' });
+    }
+    res.json(car);
+  } catch (err) {
+    console.error('Autó lekérdezési hiba:', err);
+    res.status(500).json({ error: 'Hiba az autó lekérdezésekor!' });
   }
 });
 

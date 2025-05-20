@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-const FuelEntry = require('../models/FuelEntry');
+const RefuelEntry = require('../models/RefuelEntry');
 
 const router = express.Router();
 
@@ -20,20 +20,20 @@ function authenticateToken(req, res, next) {
 
 router.use(authenticateToken);
 
-// === GET /api/fuel?carId=... – az adott autó bejegyzései ===
+// === GET /api/refuel?carId=... – az adott autó bejegyzései ===
 router.get('/', async (req, res) => {
     try {
         const { carId } = req.query;
         if (!carId) return res.status(400).json({ error: 'Hiányzó carId paraméter!' });
 
-        const entries = await FuelEntry.find({ userId: req.userId, carId });
+        const entries = await RefuelEntry.find({ userId: req.userId, carId });
         res.json(entries);
     } catch (err) {
         res.status(500).json({ error: 'Hiba a lekérdezés során!' });
     }
 });
 
-// === POST /api/fuel – új bejegyzés autóhoz ===
+// === POST /api/refuel – új bejegyzés autóhoz ===
 router.post('/', [
     body('carId').notEmpty().withMessage('Az autó azonosítója (carId) kötelező!'),
     body('date')
@@ -53,7 +53,7 @@ router.post('/', [
         const price = Math.round(liters * unitPrice);
 
         // Keresd meg az utolsó bejegyzést ehhez az autóhoz
-        const lastEntry = await FuelEntry.findOne({ userId, carId }).sort({ odometer: -1 });
+        const lastEntry = await RefuelEntry.findOne({ userId, carId }).sort({ odometer: -1 });
 
         let consumption = undefined;
         if (lastEntry && lastEntry.odometer && odometer > lastEntry.odometer) {
@@ -67,7 +67,7 @@ router.post('/', [
             });
         }
 
-        const newEntry = new FuelEntry({
+        const newEntry = new RefuelEntry({
             ...req.body,
             userId,
             price,
@@ -81,10 +81,10 @@ router.post('/', [
     }
 });
 
-// === GET /api/fuel/:id ===
+// === GET /api/refuel/:id ===
 router.get('/:id', async (req, res) => {
     try {
-        const entry = await FuelEntry.findOne({ _id: req.params.id, userId: req.userId });
+        const entry = await RefuelEntry.findOne({ _id: req.params.id, userId: req.userId });
         if (!entry) return res.status(404).json({ error: 'Nem található ilyen bejegyzés!' });
         res.json(entry);
     } catch (err) {
@@ -92,10 +92,10 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// === DELETE /api/fuel/:id ===
+// === DELETE /api/refuel/:id ===
 router.delete('/:id', async (req, res) => {
     try {
-        const deleted = await FuelEntry.findOneAndDelete({ _id: req.params.id, userId: req.userId });
+        const deleted = await RefuelEntry.findOneAndDelete({ _id: req.params.id, userId: req.userId });
         if (!deleted) return res.status(404).json({ error: 'Nem található ilyen bejegyzés!' });
         res.json({ message: 'Bejegyzés törölve!', id: deleted._id });
     } catch (err) {
