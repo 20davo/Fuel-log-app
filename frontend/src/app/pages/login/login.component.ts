@@ -28,6 +28,10 @@ export class LoginComponent {
 
   constructor(private auth: AuthService, private router: Router) {}
 
+  ngOnInit() {
+    this.auth.clearToken();
+  }
+
   login() {
     if (!this.email || !this.password) {
       return alert('Kérlek, add meg az email címed és a jelszavad!');

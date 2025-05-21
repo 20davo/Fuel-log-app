@@ -7,75 +7,105 @@
   </div>
 
   <div *ngIf="showAddForm" class="add-form">
-    <form class="entry-form">
+    <form [formGroup]="entryForm" class="entry-form">
       <mat-form-field appearance="outline">
         <mat-label>Dátum</mat-label>
-        <input matInput
-              type="text"
-              name="date"
-              required
-              maxlength="10"
-              [max]="today"
-              [ngModel]="date"
-              (input)="formatDate($event)"
-              placeholder="ÉÉÉÉ-HH-NN">
+        <input
+          matInput
+          formControlName="date"
+          placeholder="ÉÉÉÉ-HH-NN"
+          [max]="today"
+          (input)="formatDateInput($event)">
+        <mat-error *ngIf="entryForm.get('date')?.hasError('required')">
+          Kötelező kitölteni!
+        </mat-error>
+        <mat-error *ngIf="entryForm.get('date')?.hasError('pattern')">
+          Hibás formátum!
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Kilométeróra állás</mat-label>
-        <input matInput [(ngModel)]="odometer" (ngModelChange)="onOdometerChange($event)" 
-          name="odometer" required>
+        <input
+          matInput
+          formControlName="odometer"
+          (input)="formatOdometerInput($any($event.target).value)">
+        <mat-error *ngIf="entryForm.get('odometer')?.hasError('required')">
+          Kötelező kitölteni!
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Tankolt mennyiség (liter)</mat-label>
-        <input matInput type="number" [(ngModel)]="liters" name="liters" required>
+        <input matInput type="number" formControlName="liters">
+        <mat-error *ngIf="entryForm.get('liters')?.hasError('required')">
+          Kötelező kitölteni!
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Egységár (Ft / liter)</mat-label>
-        <input matInput type="number" [(ngModel)]="unitPrice" name="unitPrice" 
-          required>
+        <mat-label>Egységár (Ft/liter)</mat-label>
+        <input matInput type="number" formControlName="unitPrice">
+        <mat-error *ngIf="entryForm.get('unitPrice')?.hasError('required')">
+          Kötelező kitölteni!
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Helyszín (opcionális)</mat-label>
-        <input matInput [(ngModel)]="location" name="location">
+        <mat-label>Helyszín</mat-label>
+        <input matInput formControlName="location">
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Üzemanyag típus</mat-label>
-        <mat-select [(ngModel)]="fuelType" name="fuelType">
+        <mat-select formControlName="fuelType">
           <mat-option value="">– Válassz –</mat-option>
-          <mat-option value="benzin">Benzin</mat-option>
+          <mat-option value="benzin">Benzin (alapértelmezett)</mat-option>
           <mat-option value="dízel">Dízel</mat-option>
           <mat-option value="gáz">LPG</mat-option>
         </mat-select>
       </mat-form-field>
 
-      <button mat-button (click)="create()">Mentés</button>
+      <button mat-button (click)="create()" [disabled]="entryForm.invalid">
+        Mentés
+      </button>
     </form>
   </div>
 </mat-card>
 
-
 <mat-card style="margin-top: 20px;">
-
   <h3>{{ car.brand }} {{ car.model }}</h3>
-
   <div *ngFor="let entry of entries" class="entry-card">
     <div class="entry-header">
-      <strong>{{ entry.date | date:'yyyy.MM.dd' }}</strong>
+      <strong>{{ entry.date | date: 'yyyy.MM.dd' }}</strong>
       <span>{{ entry.fuelType || '–' | titlecase }}</span>
     </div>
 
     <div class="entry-data">
-      <div>Kilométeróra állás: <strong>{{ entry.odometer | number: '1.0-0' }} km</strong></div>
-      <div>Tankolt mennyiség: <strong>{{ entry.liters }} L</strong></div>
-      <div>Egységár: <strong>{{ entry.unitPrice | number: '1.0-0' }} Ft/L</strong></div>
-      <div>Fizetett összeg: <strong>{{ entry.price | number: '1.0-0' }} Ft</strong></div>
-      <div *ngIf="entry.location">Helyszín: <strong>{{ entry.location }}</strong></div>
-      <div style="padding-top:10px" *ngIf="entry.consumption !== undefined">Fogyasztás: <strong>{{ entry.consumption }} L / 100 km</strong></div>
+      <div>
+        Kilométeróra állás:
+        <strong>{{ entry.odometer | number: '1.0-0' }} km</strong>
+      </div>
+      <div>
+        Tankolt mennyiség:
+        <strong>{{ entry.liters }} L</strong>
+      </div>
+      <div>
+        Egységár:
+        <strong>{{ entry.unitPrice | number: '1.0-0' }} Ft/L</strong>
+      </div>
+      <div>
+        Fizetett összeg:
+        <strong>{{ entry.price | number: '1.0-0' }} Ft</strong>
+      </div>
+      <div *ngIf="entry.location">
+        Helyszín:
+        <strong>{{ entry.location }}</strong>
+      </div>
+      <div *ngIf="entry.consumption !== undefined" style="padding-top: 10px">
+        Fogyasztás:
+        <strong>{{ entry.consumption }} L / 100 km</strong> (Teli tank esetén értendő!)
+      </div>
     </div>
 
     <div class="entry-actions">
@@ -83,4 +113,3 @@
     </div>
   </div>
 </mat-card>
-

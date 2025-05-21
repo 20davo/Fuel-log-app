@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { CarService } from '../../../../services/car.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
-import { AuthService } from '../../../../services/auth.service';
 import { MatIconModule } from '@angular/material/icon';
+
+import { AuthService } from '../../../../services/auth.service';
+import { CarService } from '../../../../services/car.service';
+
 
 @Component({
   selector: 'app-car-list',
@@ -16,7 +19,7 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrls: ['./car-list.component.css'],
   imports: [
     CommonModule,
-    FormsModule,
+    ReactiveFormsModule,
     MatInputModule,
     MatCardModule,
     MatButtonModule,
@@ -24,17 +27,16 @@ import { MatIconModule } from '@angular/material/icon';
   ]
 })
 export class CarListComponent implements OnInit {
+  addCarForm!: FormGroup;
   cars: any[] = [];
-
-  brand = '';
-  model = '';
-  year = '';
-  engine = '';
-  plate = '';
-
-  constructor(private carService: CarService, private router: Router, private auth: AuthService) {}
-
   isAuthenticated = false;
+
+  constructor(
+    private carService: CarService, 
+    private router: Router, 
+    private auth: AuthService,
+    private fb: FormBuilder
+  ) {}
 
   ngOnInit() {
     const token = this.auth.getToken();
@@ -46,6 +48,19 @@ export class CarListComponent implements OnInit {
 
     this.isAuthenticated = true;
     this.fetchCars();
+
+    this.addCarForm = this.fb.group({
+      brand: ['', Validators.required],
+      model: ['', Validators.required],
+      year: ['', Validators.pattern(/^\d{4}$/)],
+      engine: [''],
+      plate: [
+        '',
+        Validators.pattern(
+          /^(?:[A-Z]{3}-?[0-9]{3}|[A-Z]{2} [A-Z]{2}-[0-9]{3})$/
+        )
+      ]
+    });
   }
 
   fetchCars() {
@@ -56,26 +71,22 @@ export class CarListComponent implements OnInit {
           this.auth.handleAuthError(err);
         } else {
           alert('Hiba az autók lekérdezésekor!');
+          this.auth.logout();
         }
       }
     });
   }
 
   addCar() {
-    if (this.plate && !this.isValidPlate(this.plate)) {
-      alert('Érvényes rendszámot adj meg!');
+    if (this.addCarForm.invalid) {
+      this.addCarForm.markAllAsTouched();
       return;
     }
-    this.carService.addCar({
-      brand: this.brand,
-      model: this.model,
-      year: Number(this.year),
-      engine: this.engine || undefined,
-      plate: this.plate || undefined
-    }).subscribe({
-      next: () => {
-        this.resetForm();
-        this.fetchCars();
+    this.carService.addCar(this.addCarForm.value)
+      .subscribe({
+        next: () => {
+          this.addCarForm.reset();
+          this.fetchCars();
       },
       error: err => {
         if (err.error?.error === 'Érvénytelen token!') {
@@ -92,7 +103,7 @@ export class CarListComponent implements OnInit {
     if (!confirm('Biztosan törölni szeretnéd?')) return;
     this.carService.deleteCar(id).subscribe({
       next: () => this.fetchCars(),
-      error: err => alert('Hiba az autó törlésekor!')
+      error: () => alert('Hiba az autó törlésekor!')
     });
   }
 
@@ -100,20 +111,9 @@ export class CarListComponent implements OnInit {
     this.router.navigate(['account', 'cars', id]);
   }
 
-  resetForm() {
-    this.brand = '';
-    this.model = '';
-    this.year = '';
-    this.engine = '';
-    this.plate = '';
-  }
-
-  limitYearLength(event: any) {
-    const input = event.target;
-    if (input.value.length > 4) {
-      input.value = input.value.slice(0, 4);
-      this.year = input.value;
-    }
+  formatYearInput(event: any) {
+    let raw = event.target.value.replace(/\D/g, '').slice(0, 4);
+    this.addCarForm.get('year')!.setValue(raw, { emitEvent: false });
   }
 
   showAddForm = false;
@@ -122,17 +122,24 @@ export class CarListComponent implements OnInit {
     this.showAddForm = !this.showAddForm;
   }
 
-  formatPlate(event: any) {
-    let raw = event.target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  formatPlateInput(event: any) {
+    let raw = (event.target.value || '')
+      .replace(/[^A-Z0-9]/gi, '')
+      .toUpperCase();
+
+    raw = raw.slice(0, 7);
+
+    let formatted = raw;
     if (raw.length === 6) {
-      // régi formátum: ABC123 → ABC-123
-      this.plate = `${raw.slice(0, 3)}-${raw.slice(3, 6)}`;
+      // régi formátum: ABC123 --> ABC-123
+      formatted = `${raw.slice(0, 3)}-${raw.slice(3)}`;
     } else if (raw.length === 7) {
-      // új formátum: AABB123 → AA BB-123
-      this.plate = `${raw.slice(0, 2)} ${raw.slice(2, 4)}-${raw.slice(4, 7)}`;
-    } else {
-      this.plate = raw;
+      // új formátum: AABB123 --> AA BB-123
+      formatted = `${raw.slice(0, 2)} ${raw.slice(2, 4)}-${raw.slice(4)}`;
     }
+
+    this.addCarForm.get('plate')!
+      .setValue(formatted, { emitEvent: false });
   }
 
   formatPlateDisplay(raw: string): string {
@@ -145,15 +152,5 @@ export class CarListComponent implements OnInit {
     }
     return raw;
   }
-
-  isValidPlate(plate: string): boolean {
-    const clean = plate.replace(/[^A-Z0-9]/gi, '').toUpperCase();
-
-    const oldRegex = /^[A-Z]{3}[0-9]{3}$/;
-    const newRegex = /^[A-Z]{4}[0-9]{3}$/;
-
-    return oldRegex.test(clean) || newRegex.test(clean);
-  }
-
 
 }

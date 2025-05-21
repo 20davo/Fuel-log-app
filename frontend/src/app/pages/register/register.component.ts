@@ -29,6 +29,10 @@ export class RegisterComponent {
 
   constructor(private auth: AuthService, private router: Router) {}
 
+  ngOnInit() {
+    this.auth.clearToken();
+  }
+
   register() {
     if (!this.name || !this.email || !this.password) {
       return alert('Kérlek, tölts ki minden mezőt!');

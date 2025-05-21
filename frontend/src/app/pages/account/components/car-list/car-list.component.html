@@ -7,37 +7,55 @@
   </div>
 
   <div *ngIf="showAddForm" class="add-form">
-    <form class="entry-form">
+    <form [formGroup]="addCarForm" class="entry-form">
       <mat-form-field appearance="outline">
         <mat-label>Márka</mat-label>
-        <input matInput [(ngModel)]="brand" name="brand" 
-          placeholder="Pl. Volkswagen" required>
+        <input matInput formControlName="brand" placeholder="Pl. Volkswagen">
+        <mat-error *ngIf="addCarForm.get('brand')?.hasError('required')">
+          Kötelező kitölteni!
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Típus</mat-label>
-        <input matInput [(ngModel)]="model" name="model" 
-          placeholder="Pl. Passat B5.5" required>
+        <input matInput formControlName="model" placeholder="Pl. Passat B5.5">
+        <mat-error *ngIf="addCarForm.get('model')?.hasError('required')">
+          Kötelező kitölteni!
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Évjárat</mat-label>
-        <input matInput type="number" [(ngModel)]="year" name="year" maxlength="4" 
-          (input)="limitYearLength($event)" placeholder="Pl. 2002">
+        <input
+          matInput
+          formControlName="year"
+          (input)="formatYearInput($event)"
+          placeholder="Pl. 2002">
+        <mat-error *ngIf="addCarForm.get('year')?.hasError('pattern')">
+          Csak négy számjegy engedélyezett!
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Motor</mat-label>
-        <input matInput [(ngModel)]="engine" name="engine" placeholder="Pl. 1.9 PDTDI">
+        <input matInput formControlName="engine" placeholder="Pl. 1.9 PDTDI">
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Rendszám</mat-label>
-        <input matInput [(ngModel)]="plate" name="plate" (input)="formatPlate($event)" 
-          placeholder="ABC-123 vagy AA BB-123" maxlength="8">
+        <input
+          matInput
+          formControlName="plate"
+          (input)="formatPlateInput($event)"
+          placeholder="ABC-123 vagy AA BB-123">
+        <mat-error *ngIf="addCarForm.get('plate')?.hasError('pattern')">
+          Hibás formátum!
+        </mat-error>
       </mat-form-field>
 
-      <button mat-button (click)="addCar()">Mentés</button>
+      <button mat-button (click)="addCar()" [disabled]="addCarForm.invalid">
+        Mentés
+      </button>
     </form>
   </div>
 </mat-card>
@@ -47,7 +65,9 @@
 
   <div *ngFor="let car of cars" class="entry-card">
     <div class="entry-data">
-      <span class="carLink" (click)="selectCar(car._id)"><strong>{{ car.brand }} {{ car.model }}</strong></span>
+      <span class="carLink" (click)="selectCar(car._id)">
+        <strong>{{ car.brand }} {{ car.model }}</strong>
+      </span>
       <div *ngIf="car.year">Évjárat: {{ car.year }}</div>
       <div *ngIf="car.engine">Motor: {{ car.engine }}</div>
       <div *ngIf="car.plate">Rendszám: {{ formatPlateDisplay(car.plate) }}</div>
