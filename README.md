@@ -1,6 +1,6 @@
 # Webtechnológiák 2 – Beadandó
 ## Tankolásnapló alkalmazás
-A Tankolásnapló egy webes nyilvántartó rendszer, amely segít az autótulajdonosoknak naplózni a tankolási adataikat, kiszámítani az üzemanyag-fogyasztást és nyílvántartani mennyit fizettek a tankolásokkor. Az alkalmazás fejlesztése során a modern MEAN (MongoDB, Express, Angular, Node.js) stack technológiát és Angular Material-t használtam.
+Az alkalmazás olyan autótulajdonosok számára készült, akik szeretnék nyomon követni tankolásaikat, azok költségeit, és járművük üzemanyag-fogyasztását. Az alkalmazás fejlesztése során a modern MEAN (MongoDB, Express, Angular, Node.js) stack technológiát és Angular Material-t használtam.
 
 ---
 
@@ -10,7 +10,7 @@ A Tankolásnapló egy webes nyilvántartó rendszer, amely segít az autótulajd
 
 ---
 
-## Használt programok verziói
+## Használt technológiák és verziók
 - **Node.js** v22.14.0
 - **npm** 10.9.2
 - **Angular CLI** 19.2.12
@@ -33,7 +33,7 @@ JWT_SECRET=valami_super_titkos_kulcs
 - Tankolások rögzítése egy-egy autóhoz
 - Átlagfogyasztás számítás
 - Token alapú autentikáció (JWT)
-- Angular Material felület, világos/sötét téma (még csak az basics)
+- Angular Material felület, világos/sötét téma (egyelőre csak a basics)
 - Input validáció és formázás
 
 ---
