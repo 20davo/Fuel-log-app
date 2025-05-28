@@ -1,6 +1,6 @@
 # Web technológiák 2 – Beadandó
 ## Tankolásnapló alkalmazás
-Az alkalmazás olyan autótulajdonosok számára készült, akik szeretik nyomon követni tankolásaikat, azok költségeit, és járművük üzemanyag-fogyasztását. Az alkalmazás fejlesztése során a modern MEAN (MongoDB, Express, Angular, Node.js) stack technológiát és Angular Material-t használtam.
+Az alkalmazás olyan autótulajdonosok számára készült, akik szeretnék egyszerűen nyomon követni tankolásaikat, az azokhoz kapcsolódó költségeket, valamint járművük üzemanyag-fogyasztását. Az alkalmazás fejlesztése során a modern MEAN (MongoDB, Express, Angular, Node.js) stack technológiát és Angular Material-t használtam.
 
 ---
 
