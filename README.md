@@ -84,7 +84,7 @@ Az útvonalakat az `app.config.ts`-ben állítottam be. A biztonságos navigáci
 
 - **LoginComponent** – E-maillel és jelszóval való belépés. Sikeres belépéskor a JWT token mentésre kerül a Local Storage-ba.
 - **RegisterComponent** – Egyszerű regisztrációs űrlap (név, email, jelszó). Regisztráció után visszairányít a beléptető oldalra.
-- **AccountComponent** – A bejelentkezett felhasználó főoldala. Innen érhetők el az alkalmazás főbb funkciói, egyelőre két menüpont (autóim, kijelentkezés). A témaváltó ikon is itt található – egyelőre csak vizuálisan jelenik meg, funkció nélkül.
+- **AccountComponent** – A bejelentkezett felhasználó főoldala. Innen érhetők el az alkalmazás főbb funkciói, egyelőre két menüpont (autóim, kijelentkezés). A témaváltó ikon is itt található, ami egyelőre csak vizuálisan jelenik meg, funkció nélkül.
 - **CarListComponent** – Autók listázása, hozzáadása (validációval), törlése.  
   A rendszám megadásakor kizárólag a Magyarországon jelenleg érvényes formátumokat fogadja el:  
   - **Régi típus:** `ABC-123`  
